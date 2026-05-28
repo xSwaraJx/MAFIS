@@ -3,4 +3,4 @@ models:
     engine: openai
     model: llama-3.3-70b-versatile
     parameters:
-      openai_api_base: https://api.groq.com/openai/v1
+      base_url: https://api.groq.com/openai/v1

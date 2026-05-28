@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -18,6 +19,8 @@ class GuardedResponse:
 class GuardrailsWrapper:
     def __init__(self) -> None:
         try:
+            from app.config import get_settings
+            os.environ["OPENAI_API_KEY"] = get_settings().groq_api_key
             config = RailsConfig.from_path(str(GUARDRAILS_DIR))
             self.rails = LLMRails(config)
         except Exception as e:
