@@ -99,4 +99,17 @@ def get_technical_indicators(ticker: str) -> dict:
         return {"error": str(e), "ticker": ticker}
 
 
-EQUITY_TOOLS: list = [get_stock_price, get_stock_history, get_technical_indicators]
+@tool
+def get_market_summary() -> dict:
+    """Return current price and day change % for SPY, QQQ, and DIA as a market summary."""
+    summary = []
+    for sym in ("SPY", "QQQ", "DIA"):
+        result = get_stock_price.invoke({"ticker": sym})
+        if "error" in result:
+            summary.append({"ticker": sym, "error": result["error"]})
+        else:
+            summary.append({"ticker": sym, "current_price": result["current_price"], "day_change_pct": result["day_change_pct"]})
+    return {"market_summary": summary, "as_of": date.today().isoformat()}
+
+
+EQUITY_TOOLS: list = [get_stock_price, get_stock_history, get_technical_indicators, get_market_summary]
