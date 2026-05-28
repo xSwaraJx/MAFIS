@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 
 from langchain_core.messages import HumanMessage
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from langgraph.prebuilt import create_react_agent
 
 from app.config import get_settings
@@ -24,10 +24,10 @@ FX_SYSTEM_PROMPT = (
 
 class FXAgent:
     def __init__(self) -> None:
-        llm = ChatOpenAI(
+        llm = ChatGroq(
             model=get_settings().model_name,
             temperature=0,
-            api_key=get_settings().openai_api_key,
+            api_key=get_settings().groq_api_key,
         )
         self.graph = create_react_agent(llm, FX_TOOLS, prompt=FX_SYSTEM_PROMPT)
         self.guardrails = GuardrailsWrapper()

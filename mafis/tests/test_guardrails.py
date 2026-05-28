@@ -73,7 +73,7 @@ def test_guardrails_wrapper_graceful_fallback(guardrails_wrapper):
 # ---------------------------------------------------------------------------
 
 def test_guardrail_flag_propagates_to_agent_response():
-    with patch("app.agents.rates_agent.ChatOpenAI"):
+    with patch("app.agents.rates_agent.ChatGroq"):
         from app.agents.rates_agent import RatesAgent
         agent = RatesAgent()
 

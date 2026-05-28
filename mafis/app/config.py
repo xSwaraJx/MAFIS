@@ -6,13 +6,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    openai_api_key: str
+    groq_api_key: str
     fred_api_key: str
     environment: str = "development"
     log_level: str = "INFO"
-    model_name: str = "gpt-4o"
+    model_name: str = "llama-3.3-70b-versatile"
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
 
 @functools.lru_cache

@@ -23,8 +23,8 @@ from app.schemas import (
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     s = get_settings()
-    if not s.openai_api_key or s.openai_api_key == "your-openai-api-key-here":
-        raise RuntimeError("OPENAI_API_KEY is not set in .env")
+    if not s.groq_api_key or s.groq_api_key == "your-groq-api-key-here":
+        raise RuntimeError("GROQ_API_KEY is not set in .env")
     if not s.fred_api_key or s.fred_api_key == "your-fred-api-key-here":
         raise RuntimeError("FRED_API_KEY is not set in .env")
     app.state.orchestrator = MAFISOrchestrator()

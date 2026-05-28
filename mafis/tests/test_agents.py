@@ -24,21 +24,21 @@ mock_agent_response = AgentResponse(
 # ---------------------------------------------------------------------------
 
 def test_rates_agent_initialises():
-    with patch("app.agents.rates_agent.ChatOpenAI"):
+    with patch("app.agents.rates_agent.ChatGroq"):
         from app.agents.rates_agent import RatesAgent
         a = RatesAgent()
     assert hasattr(a, "graph")
 
 
 def test_fx_agent_initialises():
-    with patch("app.agents.fx_agent.ChatOpenAI"):
+    with patch("app.agents.fx_agent.ChatGroq"):
         from app.agents.fx_agent import FXAgent
         a = FXAgent()
     assert hasattr(a, "graph")
 
 
 def test_equities_agent_initialises():
-    with patch("app.agents.equities_agent.ChatOpenAI"):
+    with patch("app.agents.equities_agent.ChatGroq"):
         from app.agents.equities_agent import EquitiesAgent
         a = EquitiesAgent()
     assert hasattr(a, "graph")
@@ -62,7 +62,7 @@ def _mock_guardrails(answer: str) -> MagicMock:
 
 
 def test_rates_agent_run_shape():
-    with patch("app.agents.rates_agent.ChatOpenAI"):
+    with patch("app.agents.rates_agent.ChatGroq"):
         from app.agents.rates_agent import RatesAgent
         a = RatesAgent()
     a.graph = MagicMock()
@@ -76,7 +76,7 @@ def test_rates_agent_run_shape():
 
 
 def test_fx_agent_run_shape():
-    with patch("app.agents.fx_agent.ChatOpenAI"):
+    with patch("app.agents.fx_agent.ChatGroq"):
         from app.agents.fx_agent import FXAgent
         a = FXAgent()
     a.graph = MagicMock()
@@ -90,7 +90,7 @@ def test_fx_agent_run_shape():
 
 
 def test_equities_agent_run_shape():
-    with patch("app.agents.equities_agent.ChatOpenAI"):
+    with patch("app.agents.equities_agent.ChatGroq"):
         from app.agents.equities_agent import EquitiesAgent
         a = EquitiesAgent()
     a.graph = MagicMock()
@@ -114,7 +114,7 @@ def test_agent_run_returns_response_on_executor_error():
         ("EquitiesAgent", "EquitiesAgent", "app.agents.equities_agent"),
     ]:
         chat_module = module.replace("_agent", "_agent").rsplit(".", 1)[0] + "." + module.rsplit(".", 1)[1]
-        with patch(f"{module}.ChatOpenAI"):
+        with patch(f"{module}.ChatGroq"):
             import importlib
             mod = importlib.import_module(module)
             cls = getattr(mod, AgentClass)
