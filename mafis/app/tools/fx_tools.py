@@ -12,6 +12,7 @@ import httpx
 from langchain_core.tools import tool
 
 BASE_URL = "https://api.frankfurter.dev/v1"
+SUPPORTED_CURRENCIES = {"USD", "EUR", "GBP", "JPY", "CHF", "AUD", "CAD", "SEK", "NOK", "NZD"}
 
 
 def _fetch(endpoint: str, params: dict) -> dict:
@@ -33,6 +34,8 @@ def _fetch(endpoint: str, params: dict) -> dict:
 @tool
 def get_fx_rate(base: str, target: str) -> dict:
     """Return the latest FX rate between two currency codes (e.g. USD, EUR)."""
+    if base not in SUPPORTED_CURRENCIES or target not in SUPPORTED_CURRENCIES:
+        return {"error": f"Unsupported currency. Supported: {sorted(SUPPORTED_CURRENCIES)}"}
     result = _fetch("/latest", {"from": base, "to": target})
     if "error" in result:
         return result
@@ -62,6 +65,8 @@ def get_fx_historical(base: str, target: str, days: int = 30) -> dict:
 @tool
 def get_fx_change_pct(base: str, target: str, days: int = 30) -> dict:
     """Return the percentage change in an FX rate over a given number of days."""
+    if base not in SUPPORTED_CURRENCIES or target not in SUPPORTED_CURRENCIES:
+        return {"error": f"Unsupported currency. Supported: {sorted(SUPPORTED_CURRENCIES)}"}
     result = get_fx_historical.invoke({"base": base, "target": target, "days": days})
     if "error" in result:
         return result
