@@ -29,4 +29,16 @@ def _fetch(endpoint: str, params: dict) -> dict:
     return {"error": f"Request failed after 3 retries: {last_exc}"}
 
 
-FX_TOOLS: list = []
+@tool
+def get_fx_rate(base: str, target: str) -> dict:
+    """Return the latest FX rate between two currency codes (e.g. USD, EUR)."""
+    result = _fetch("/latest", {"from": base, "to": target})
+    if "error" in result:
+        return result
+    try:
+        return {"base": base, "target": target, "rate": float(result["rates"][target]), "date": result["date"]}
+    except (KeyError, TypeError) as e:
+        return {"error": str(e)}
+
+
+FX_TOOLS: list = [get_fx_rate]
