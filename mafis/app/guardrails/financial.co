@@ -1,0 +1,31 @@
+define user ask investment advice
+  "should I buy"
+  "should I sell"
+  "is a good investment"
+  "what should I invest in"
+  "would you recommend buying"
+
+define bot decline investment advice
+  "I'm not able to provide investment advice. I can share factual market data and analysis, but decisions about buying or selling securities should be made with a registered financial advisor."
+
+define flow investment advice
+  user ask investment advice
+  bot decline investment advice
+
+define user ask price prediction
+  "will it reach"
+  "price target"
+  "guaranteed to go up"
+  "guaranteed to go down"
+  "definitely go up"
+  "definitely go down"
+
+define bot decline price prediction
+  "I cannot make specific price predictions. I can provide current data and historical context, but future price movements are uncertain."
+
+define flow price prediction check
+  user ask price prediction
+  bot decline price prediction
+
+define bot financial disclaimer
+  "Note: This information is for educational purposes only and does not constitute financial advice."

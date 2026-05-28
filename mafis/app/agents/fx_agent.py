@@ -9,6 +9,7 @@ from langgraph.prebuilt import create_react_agent
 from app.config import get_settings
 from app.tools.fx_tools import FX_TOOLS
 from app.schemas import AgentResponse
+from app.guardrails.guardrails import GuardrailsWrapper
 
 FX_SYSTEM_PROMPT = (
     "You are a foreign exchange analyst covering G10 currency pairs.\n"
@@ -29,6 +30,7 @@ class FXAgent:
             api_key=get_settings().openai_api_key,
         )
         self.graph = create_react_agent(llm, FX_TOOLS, prompt=FX_SYSTEM_PROMPT)
+        self.guardrails = GuardrailsWrapper()
 
     def run(self, query: str) -> AgentResponse:
         try:
@@ -45,14 +47,15 @@ class FXAgent:
                 if hasattr(msg, "tool_calls") and msg.tool_calls
                 for tc in msg.tool_calls
             ]
+            guarded = self.guardrails.apply(query, answer)
             return AgentResponse(
                 agent="FXAgent",
                 query=query,
-                answer=answer,
+                answer=guarded.text,
                 tools_used=tools_used,
                 data_snapshot={},
                 latency_ms=latency_ms,
-                guardrail_triggered=False,
+                guardrail_triggered=guarded.triggered,
             )
         except Exception as e:
             return AgentResponse(

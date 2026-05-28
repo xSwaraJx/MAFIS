@@ -9,6 +9,7 @@ from langgraph.prebuilt import create_react_agent
 from app.config import get_settings
 from app.tools.fred_tools import FRED_TOOLS
 from app.schemas import AgentResponse
+from app.guardrails.guardrails import GuardrailsWrapper
 
 RATES_SYSTEM_PROMPT = (
     "You are a rates analyst specialising in monetary policy and fixed income markets.\n"
@@ -29,6 +30,7 @@ class RatesAgent:
             api_key=get_settings().openai_api_key,
         )
         self.graph = create_react_agent(llm, FRED_TOOLS, prompt=RATES_SYSTEM_PROMPT)
+        self.guardrails = GuardrailsWrapper()
 
     def run(self, query: str) -> AgentResponse:
         try:
@@ -45,14 +47,15 @@ class RatesAgent:
                 if hasattr(msg, "tool_calls") and msg.tool_calls
                 for tc in msg.tool_calls
             ]
+            guarded = self.guardrails.apply(query, answer)
             return AgentResponse(
                 agent="RatesAgent",
                 query=query,
-                answer=answer,
+                answer=guarded.text,
                 tools_used=tools_used,
                 data_snapshot={},
                 latency_ms=latency_ms,
-                guardrail_triggered=False,
+                guardrail_triggered=guarded.triggered,
             )
         except Exception as e:
             return AgentResponse(
