@@ -66,4 +66,19 @@ def get_yield_curve_spread() -> dict:
         return {"error": str(e)}
 
 
-FRED_TOOLS: list = [get_fed_funds_rate, get_treasury_yield, get_yield_curve_spread]
+@tool
+def get_cpi_inflation() -> dict:
+    """Return year-over-year CPI inflation from FRED series CPIAUCSL."""
+    try:
+        series = _get_fred_client().get_series("CPIAUCSL", observation_start=None).dropna()
+        series = series.iloc[-13:]
+        latest_value = float(series.iloc[-1])
+        twelve_months_ago = float(series.iloc[0])
+        yoy = (latest_value / twelve_months_ago - 1) * 100
+        latest_date = str(series.index[-1].date())
+        return {"series": "CPIAUCSL", "yoy_change_pct": round(yoy, 4), "latest_date": latest_date, "latest_value": latest_value}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+FRED_TOOLS: list = [get_fed_funds_rate, get_treasury_yield, get_yield_curve_spread, get_cpi_inflation]
