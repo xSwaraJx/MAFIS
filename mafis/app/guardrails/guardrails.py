@@ -32,7 +32,8 @@ class GuardrailsWrapper:
                 {"role": "user", "content": query},
                 {"role": "assistant", "content": agent_response},
             ]
-            output = self.rails.generate(messages=messages)
+            raw = self.rails.generate(messages=messages)
+            output = raw if isinstance(raw, str) else raw.get("content", agent_response)
             triggered = output != agent_response
             return GuardedResponse(
                 text=output,
