@@ -59,4 +59,19 @@ def get_fx_historical(base: str, target: str, days: int = 30) -> dict:
     return {"base": base, "target": target, "days": days, "series": series}
 
 
-FX_TOOLS: list = [get_fx_rate, get_fx_historical]
+@tool
+def get_fx_change_pct(base: str, target: str, days: int = 30) -> dict:
+    """Return the percentage change in an FX rate over a given number of days."""
+    result = get_fx_historical.invoke({"base": base, "target": target, "days": days})
+    if "error" in result:
+        return result
+    series = result.get("series", [])
+    if len(series) < 2:
+        return {"error": "Insufficient data"}
+    start_rate = series[0]["rate"]
+    end_rate = series[-1]["rate"]
+    change_pct = (end_rate / start_rate - 1) * 100
+    return {"base": base, "target": target, "days": days, "change_pct": round(change_pct, 4), "start_rate": start_rate, "end_rate": end_rate}
+
+
+FX_TOOLS: list = [get_fx_rate, get_fx_historical, get_fx_change_pct]
