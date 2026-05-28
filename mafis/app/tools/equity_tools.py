@@ -35,4 +35,30 @@ def get_stock_price(ticker: str) -> dict:
         return {"error": str(e), "ticker": ticker}
 
 
-EQUITY_TOOLS: list = [get_stock_price]
+@tool
+def get_stock_history(ticker: str, period: str) -> dict:
+    """Return summary statistics for a stock's OHLCV history over a given period (1mo, 3mo, 6mo, 1y)."""
+    if period not in {"1mo", "3mo", "6mo", "1y"}:
+        return {"error": "Invalid period. Use 1mo, 3mo, 6mo, or 1y."}
+    try:
+        hist = _get_ticker(ticker).history(period=period)
+        if hist.empty:
+            return {"error": "No data returned", "ticker": ticker}
+        start_price = float(hist["Close"].iloc[0])
+        end_price = float(hist["Close"].iloc[-1])
+        total_return_pct = (end_price / start_price - 1) * 100
+        return {
+            "ticker": ticker,
+            "period": period,
+            "data_points": len(hist),
+            "start_date": str(hist.index[0].date()),
+            "end_date": str(hist.index[-1].date()),
+            "start_price": start_price,
+            "end_price": end_price,
+            "total_return_pct": round(total_return_pct, 4),
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
+EQUITY_TOOLS: list = [get_stock_price, get_stock_history]
