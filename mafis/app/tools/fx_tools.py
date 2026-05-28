@@ -6,6 +6,7 @@ from __future__ import annotations
 # - get_fx_change_pct
 
 import time
+from datetime import date, timedelta
 
 import httpx
 from langchain_core.tools import tool
@@ -41,4 +42,21 @@ def get_fx_rate(base: str, target: str) -> dict:
         return {"error": str(e)}
 
 
-FX_TOOLS: list = [get_fx_rate]
+@tool
+def get_fx_historical(base: str, target: str, days: int = 30) -> dict:
+    """Return a historical FX rate series for a currency pair over the specified number of days."""
+    start_date = (date.today() - timedelta(days=days)).isoformat()
+    end_date = date.today().isoformat()
+    result = _fetch(f"/{start_date}..{end_date}", {"from": base, "to": target})
+    if "error" in result:
+        return result
+    if "rates" not in result:
+        return {"error": "No data returned"}
+    series = sorted(
+        [{"date": d, "rate": float(rates[target])} for d, rates in result["rates"].items() if target in rates],
+        key=lambda x: x["date"],
+    )
+    return {"base": base, "target": target, "days": days, "series": series}
+
+
+FX_TOOLS: list = [get_fx_rate, get_fx_historical]
