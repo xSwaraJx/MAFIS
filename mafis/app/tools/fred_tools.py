@@ -44,4 +44,26 @@ def get_treasury_yield(maturity: str) -> dict:
         return {"error": str(e)}
 
 
-FRED_TOOLS: list = [get_fed_funds_rate, get_treasury_yield]
+@tool
+def get_yield_curve_spread() -> dict:
+    """Return the 10Y-2Y Treasury yield spread and a curve signal from FRED."""
+    try:
+        client = _get_fred_client()
+        s10 = client.get_series("DGS10").dropna()
+        s2 = client.get_series("DGS2").dropna()
+        ten_year = float(s10.iloc[-1])
+        two_year = float(s2.iloc[-1])
+        spread = ten_year - two_year
+        date = str(s10.index[-1].date())
+        if spread < 0:
+            signal = "INVERTED (recession signal)"
+        elif spread < 0.5:
+            signal = "FLAT"
+        else:
+            signal = "NORMAL"
+        return {"spread_bps": round(spread * 100, 2), "ten_year": ten_year, "two_year": two_year, "date": date, "signal": signal}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+FRED_TOOLS: list = [get_fed_funds_rate, get_treasury_yield, get_yield_curve_spread]
