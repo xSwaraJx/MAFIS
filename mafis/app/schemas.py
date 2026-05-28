@@ -27,3 +27,9 @@ class OrchestratorResponse(BaseModel):
     equities: AgentResponse | None = None
     total_latency_ms: float
     any_guardrail_triggered: bool = False
+
+
+class HealthResponse(BaseModel):
+    status: str
+    model: str
+    environment: str
